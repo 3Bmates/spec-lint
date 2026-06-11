@@ -1,0 +1,43 @@
+{
+  "name": "spec-lint",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "规格与代码一致性检查工具 — AI 驱动的 SDD 质量门禁",
+  "main": "dist/index.js",
+  "bin": {
+    "spec-lint": "./dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "tsx src/index.ts",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "lint": "node dist/index.js --spec ./specs --src ./src",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "spec-driven-development",
+    "sdd",
+    "lint",
+    "spec",
+    "code-check",
+    "ai",
+    "cli"
+  ],
+  "license": "MIT",
+  "files": [
+    "dist/",
+    "specs/",
+    "README.md"
+  ],
+  "devDependencies": {
+    "@types/node": "^20.14.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.5.0",
+    "vitest": "^1.6.0"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
