@@ -18,7 +18,7 @@
 ## 快速开始
 
 ```bash
-npm install -g spec-lint
+npm install -g spec-lint-cli
 cd my-project
 spec-lint
 ```

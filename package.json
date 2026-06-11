@@ -1,6 +1,6 @@
 {
-  "name": "spec-lint",
-  "version": "0.1.0",
+  "name": "spec-lint-cli",
+  "version": "0.1.1",
   "type": "module",
   "description": "规格与代码一致性检查工具 — AI 驱动的 SDD 质量门禁",
   "main": "dist/index.js",
