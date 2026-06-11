@@ -13,11 +13,20 @@
 - 检查源码实现是否与规格声明一致
 - 可选调用 AI 进行语义级别的深度审查
 
-### 1.2 非目标（v0.1 不做）
+### 1.2 v0.1 功能清单
+
+- ✅ 基本检查（接口/类型/函数存在性 + 签名匹配）
+- ✅ AI 语义审查（Ollama 免费 + Anthropic 可选）
+- ✅ 配置文件 `.spec-lintrc.json`
+- ✅ Watch 模式（文件变更自动重检）
+- ✅ Git pre-commit hook 安装
+- ✅ 彩色终端输出
+- ✅ JSON / Text 双格式输出
+
+### 1.3 非目标（v0.1 不做）
 
 - 不自动修复不一致（只报告）
 - 不支持非 TypeScript 语言（先聚焦 TS）
-- 不做实时文件监听（watch mode）
 
 ---
 
@@ -302,4 +311,33 @@ interface CheckResult {
 - **签名**: `checkConsistency(spec: ParsedSpec, srcDir: string): CheckResult[]`
 
 ## 函数: aiReview
-- **签名**: `aiReview(spec: ParsedSpec, checkResults: CheckResult[], sourceCode: string, options?: { apiKey?: string; baseUrl?: string }): Promise<AIReviewSummary | null>`
+- **签名**: `aiReview(spec: ParsedSpec, checkResults: CheckResult[], sourceCode: string, options?: { provider?: AIProvider; apiKey?: string; baseUrl?: string; model?: string }): Promise<AIReviewSummary | null>`
+
+## 函数: loadConfig
+- **签名**: `loadConfig(cwd?: string): SpecLintConfig`
+
+## 类型: SpecLintConfig
+```typescript
+interface SpecLintConfig {
+  specDir: string;
+  srcDir: string;
+  severity: {
+    interfaceMissing: 'error' | 'warning' | 'off';
+    methodMissing: 'error' | 'warning' | 'off';
+    typeMissing: 'error' | 'warning' | 'off';
+    functionMissing: 'error' | 'warning' | 'off';
+    fieldMissing: 'error' | 'warning' | 'off';
+  };
+  rules: {
+    checkInterfaces: boolean;
+    checkTypes: boolean;
+    checkFunctions: boolean;
+  };
+  ai: {
+    enabled: boolean;
+    provider: 'ollama' | 'anthropic';
+    model: string;
+  };
+  ignore: string[];
+}
+```

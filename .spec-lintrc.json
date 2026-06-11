@@ -1,0 +1,22 @@
+{
+  "specDir": "./specs",
+  "srcDir": "./src",
+  "severity": {
+    "interfaceMissing": "error",
+    "methodMissing": "error",
+    "typeMissing": "error",
+    "functionMissing": "error",
+    "fieldMissing": "warning"
+  },
+  "rules": {
+    "checkInterfaces": true,
+    "checkTypes": true,
+    "checkFunctions": true
+  },
+  "ai": {
+    "enabled": false,
+    "provider": "ollama",
+    "model": "qwen2.5:1.5b"
+  },
+  "ignore": ["node_modules", "dist", ".git", "__tests__"]
+}

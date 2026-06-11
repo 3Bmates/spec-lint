@@ -6,6 +6,7 @@
 import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { resolve, relative, extname } from 'node:path';
 import type { ParsedSpec, InterfaceSpec, TypeSpec, FunctionSpec } from './parser.js';
+import type { SpecLintConfig } from './config.js';
 
 // ── 类型定义 ──────────────────────────────────────────
 
@@ -19,6 +20,15 @@ export interface CheckResult {
   file: string;          // 规格文件
   line: number;
 }
+
+/** 默认严重度配置 */
+const DEFAULT_SEVERITY = {
+  interfaceMissing: 'error' as const,
+  methodMissing: 'error' as const,
+  typeMissing: 'error' as const,
+  functionMissing: 'error' as const,
+  fieldMissing: 'warning' as const,
+};
 
 // ── 工具函数 ──────────────────────────────────────────
 
@@ -212,23 +222,55 @@ function escapeRegex(str: string): string {
 
 // ── 入口 ────────────────────────────────────────────────
 
-export function checkConsistency(spec: ParsedSpec, srcDir: string): CheckResult[] {
+export function checkConsistency(
+  spec: ParsedSpec,
+  srcDir: string,
+  config?: Pick<SpecLintConfig, 'severity' | 'rules'>
+): CheckResult[] {
   const sources = collectSourceFiles(srcDir);
   const results: CheckResult[] = [];
+  const sev = config?.severity || DEFAULT_SEVERITY;
+  const rules = config?.rules || { checkInterfaces: true, checkTypes: true, checkFunctions: true };
 
   // 检查接口
-  for (const iface of spec.interfaces) {
-    results.push(...checkInterface(iface, sources));
+  if (rules.checkInterfaces) {
+    for (const iface of spec.interfaces) {
+      const r = checkInterface(iface, sources);
+      // 应用严重度配置
+      for (const item of r) {
+        if (item.type === 'interface' && sev.interfaceMissing === 'off') continue;
+        if (item.type === 'method' && sev.methodMissing === 'off') continue;
+        if (item.type === 'interface') item.severity = sev.interfaceMissing as Severity;
+        if (item.type === 'method') item.severity = sev.methodMissing as Severity;
+        results.push(item);
+      }
+    }
   }
 
   // 检查类型
-  for (const typeSpec of spec.types) {
-    results.push(...checkType(typeSpec, sources));
+  if (rules.checkTypes) {
+    for (const typeSpec of spec.types) {
+      const r = checkType(typeSpec, sources);
+      for (const item of r) {
+        if (item.type === 'type' && sev.typeMissing === 'off') continue;
+        if (item.type === 'type-fields' && sev.fieldMissing === 'off') continue;
+        if (item.type === 'type') item.severity = sev.typeMissing as Severity;
+        if (item.type === 'type-fields') item.severity = sev.fieldMissing as Severity;
+        results.push(item);
+      }
+    }
   }
 
   // 检查函数
-  for (const funcSpec of spec.functions) {
-    results.push(...checkFunction(funcSpec, sources));
+  if (rules.checkFunctions) {
+    for (const funcSpec of spec.functions) {
+      const r = checkFunction(funcSpec, sources);
+      for (const item of r) {
+        if (sev.functionMissing === 'off') continue;
+        item.severity = sev.functionMissing as Severity;
+        results.push(item);
+      }
+    }
   }
 
   return results;
