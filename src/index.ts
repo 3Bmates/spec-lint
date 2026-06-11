@@ -10,7 +10,7 @@ import { resolve, extname } from 'node:path';
 import { parseArgs } from 'node:util';
 import { parseSpecs } from './parser.js';
 import { checkConsistency } from './checker.js';
-import { aiReview } from './ai-reviewer.js';
+import { aiReview, type AIProvider } from './ai-reviewer.js';
 import { formatText, formatJSON } from './reporter.js';
 
 // ── 帮助信息 ──────────────────────────────────────────
@@ -24,23 +24,26 @@ spec-lint — 规格与代码一致性检查工具（AI 驱动）
 选项:
   --spec <path>      规格文件目录（默认: ./specs/）
   --src <path>       源码目录（默认: ./src/）
-  --ai                启用 AI 语义审查
-  --ai-key <key>     AI API Key（或通过环境变量 AI_API_KEY）
+  --ai                启用 AI 语义审查（自动使用本地 Ollama）
+  --ai-provider <p>  AI 引擎: ollama (默认, 免费) | anthropic (需 Key)
+  --ai-model <name>  自定义模型名（默认: qwen2.5:1.5b）
+  --ai-key <key>     Anthropic API Key（用 --ai-provider anthropic 时需要）
   --format <type>    输出格式: text (默认) | json
   --help             显示此帮助信息
   --version          显示版本号
 
 示例:
   spec-lint                          # 默认检查
-  spec-lint --spec ./docs/specs      # 指定规格目录
-  spec-lint --ai --ai-key sk-ant-xxx # 启用 AI 审查
-  spec-lint --format json            # JSON 输出
+  spec-lint --ai                     # 启用 AI 审查 (Ollama 本地免费)
+  spec-lint --ai --ai-model qwen2.5:0.5b   # 自定义模型
+  spec-lint --ai --ai-provider anthropic --ai-key sk-ant-xxx  # 用 Claude
 
-环境变量:
-  AI_API_KEY         AI API Key
-  AI_BASE_URL        AI API 地址（可选，默认官方地址）
+免费使用 AI 审查:
+  安装 Ollama: https://ollama.com/download
+  拉取模型:    ollama pull qwen2.5:1.5b
+  然后直接:    spec-lint --ai
 
-项目地址: https://gitee.com/...  # TODO: 更新为实际地址
+项目地址: https://gitee.com/bmates/spec-lint
 `.trim();
 
 // ── 查找所有 .spec.md 文件 ────────────────────────────
@@ -95,6 +98,8 @@ async function main(): Promise<number> {
       spec: { type: 'string', default: './specs' },
       src: { type: 'string', default: './src' },
       ai: { type: 'boolean', default: false },
+      'ai-provider': { type: 'string' },
+      'ai-model': { type: 'string' },
       'ai-key': { type: 'string' },
       format: { type: 'string', default: 'text' },
       help: { type: 'boolean', default: false },
@@ -145,8 +150,11 @@ async function main(): Promise<number> {
   if (enableAI) {
     try {
       const sourceCode = collectSourceCode(srcDir);
-      const apiKey = (values['ai-key'] as string) || undefined;
-      aiResults = await aiReview(spec, checkResults, sourceCode, { apiKey });
+      aiResults = await aiReview(spec, checkResults, sourceCode, {
+        provider: values['ai-provider'] as AIProvider | undefined,
+        model: values['ai-model'] as string | undefined,
+        apiKey: (values['ai-key'] as string) || undefined,
+      });
     } catch (err) {
       console.error(`AI 审查失败: ${(err as Error).message}`);
       return 4;

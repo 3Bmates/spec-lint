@@ -154,17 +154,38 @@ interface FunctionSpec {
 | 边界处理 | 是否处理了规格中隐含的边界条件 |
 | 安全考量 | 是否存在明显安全漏洞 |
 
-#### API 调用
+#### AI 引擎
+
+| 引擎 | 默认 | 费用 | 需要 |
+|------|------|------|------|
+| **Ollama** (本地) | ✅ 默认 | 免费 | 安装 Ollama + 拉取模型 |
+| **Anthropic** (云端) | 可选 | 按量付费 | API Key |
+
+#### API 调用（Ollama 模式，默认）
 
 ```
-// 请求
+POST http://localhost:11434/api/chat
+{
+  model: "qwen2.5:1.5b",
+  stream: false,
+  messages: [{
+    role: "user",
+    content: "你是一个代码审查专家..."
+  }],
+  options: { temperature: 0.1, num_predict: 1024 }
+}
+```
+
+#### API 调用（Anthropic 模式）
+
+```
 POST https://api.anthropic.com/v1/messages
 {
   model: "claude-haiku-4-5-20251001",
   max_tokens: 1024,
   messages: [{
     role: "user",
-    content: "以下是规格定义：\n<spec>\n{specContent}\n</spec>\n\n以下是源码实现：\n<code>\n{codeContent}\n</code>\n\n请检查实现是否与规格一致..."
+    content: "你是一个代码审查专家..."
   }]
 }
 ```
