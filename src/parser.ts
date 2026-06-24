@@ -4,7 +4,7 @@
  */
 
 import { readFileSync } from 'node:fs';
-import { resolve, relative } from 'node:path';
+import { relative } from 'node:path';
 
 // ── 类型定义 ──────────────────────────────────────────
 

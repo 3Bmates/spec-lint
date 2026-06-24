@@ -81,7 +81,7 @@ export function loadConfig(cwd: string = process.cwd()): SpecLintConfig {
       try {
         const raw = JSON.parse(readFileSync(path, 'utf-8'));
         return mergeConfig(DEFAULT_CONFIG, raw);
-      } catch (err) {
+      } catch {
         console.warn(`⚠️  配置文件 ${name} 解析失败，使用默认配置`);
       }
     }

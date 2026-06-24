@@ -198,6 +198,33 @@ function checkFunction(funcSpec: FunctionSpec, sources: Map<string, string>): Ch
       file: funcSpec.file,
       line: funcSpec.line,
     });
+    return results;
+  }
+
+  // 函数签名匹配（如果规格中给出了签名）
+  if (funcSpec.signature) {
+    // 提取规格签名中的参数和返回类型
+    const sigPattern = new RegExp(
+      `${escapeRegex(funcSpec.name)}\\s*\\([^)]*\\)[^;{]*`,
+      'm'
+    );
+    const sigMatches = findInSources(sources, sigPattern);
+    const sigMatched = sigMatches.matches.some(m => {
+      const normalized = normalize(m);
+      const normalizedSpec = normalize(funcSpec.signature);
+      return normalized.includes(normalizedSpec) || normalizedSpec.includes(normalized);
+    });
+
+    if (!sigMatched) {
+      results.push({
+        type: 'function',
+        severity: 'warning',
+        specItem: funcSpec.name,
+        message: `函数 "${funcSpec.name}" 签名可能不匹配规格: \`${funcSpec.signature}\``,
+        file: funcSpec.file,
+        line: funcSpec.line,
+      });
+    }
   }
 
   return results;
@@ -267,7 +294,10 @@ export function checkConsistency(
       const r = checkFunction(funcSpec, sources);
       for (const item of r) {
         if (sev.functionMissing === 'off') continue;
-        item.severity = sev.functionMissing as Severity;
+        // 只覆盖"函数不存在"错误的严重度，签名不匹配保持 warning
+        if (item.severity === 'error') {
+          item.severity = sev.functionMissing as Severity;
+        }
         results.push(item);
       }
     }

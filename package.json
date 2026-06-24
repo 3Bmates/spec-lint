@@ -4,9 +4,24 @@
   "type": "module",
   "description": "规格与代码一致性检查工具 — AI 驱动的 SDD 质量门禁",
   "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
   "bin": {
     "spec-lint": "./dist/index.js"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/3Bmates/spec-lint.git"
+  },
+  "bugs": {
+    "url": "https://github.com/3Bmates/spec-lint/issues"
+  },
+  "homepage": "https://github.com/3Bmates/spec-lint#readme",
   "scripts": {
     "build": "tsc",
     "start": "node dist/index.js",
@@ -14,6 +29,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "lint": "node dist/index.js --spec ./specs --src ./src",
+    "lint:eslint": "eslint src/",
     "prepublishOnly": "npm run build"
   },
   "keywords": [
@@ -28,13 +44,17 @@
   "license": "MIT",
   "files": [
     "dist/",
-    "specs/",
-    "README.md"
+    "README.md",
+    "LICENSE"
   ],
   "devDependencies": {
     "@types/node": "^20.14.0",
+    "@typescript-eslint/eslint-plugin": "^8.62.0",
+    "@typescript-eslint/parser": "^8.62.0",
+    "eslint": "^10.5.0",
     "tsx": "^4.19.0",
     "typescript": "^5.5.0",
+    "typescript-eslint": "^8.62.0",
     "vitest": "^1.6.0"
   },
   "engines": {

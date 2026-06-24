@@ -1,5 +1,4 @@
 # spec-lint CI + AI 质量门禁
-# Gitee 兼容
 name: Spec-Lint CI
 
 on:
@@ -22,6 +21,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
+          cache: 'npm'
 
       - name: Install dependencies
         run: npm ci
@@ -46,6 +46,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
+          cache: 'npm'
 
       - name: Install dependencies
         run: npm ci
@@ -75,9 +76,13 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
+          cache: 'npm'
 
       - name: Install dependencies
         run: npm ci
+
+      - name: Build
+        run: npm run build
 
       - name: Setup Ollama (free local AI)
         run: |
@@ -86,8 +91,6 @@ jobs:
           sleep 5
           ollama pull qwen2.5:1.5b
 
-      - name: Build
-        run: npm run build
-
-      - name: AI-powered spec review
-        run: node dist/index.js --ai --spec ./specs --src ./src || true
+      - name: AI-powered spec review (informational)
+        continue-on-error: true
+        run: node dist/index.js --ai --spec ./specs --src ./src

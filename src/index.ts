@@ -17,8 +17,8 @@ import { watch } from 'chokidar';
 import { parseSpecs } from './parser.js';
 import { checkConsistency } from './checker.js';
 import { aiReview, type AIProvider } from './ai-reviewer.js';
-import { formatText, formatJSON, printSuccess, printError, printInfo } from './reporter.js';
-import { loadConfig, DEFAULT_CONFIG } from './config.js';
+import { formatText, formatJSON, printSuccess, printError } from './reporter.js';
+import { loadConfig } from './config.js';
 
 const PKG_PATH = resolve(import.meta.dirname!, '../package.json');
 
@@ -98,7 +98,7 @@ function collectSourceCode(srcDir: string): string {
 async function runOnce(
   specDir: string,
   srcDir: string,
-  options: { ai: boolean; provider?: string; model?: string; apiKey?: string; format: 'text' | 'json' }
+  options: RunOptions
 ): Promise<number> {
   // 1. 查找规格
   const specFiles = findSpecFiles(specDir);
@@ -159,9 +159,19 @@ async function runOnce(
   return checkResults.some(r => r.severity === 'error') ? 1 : 0;
 }
 
+// ── 类型定义 ──────────────────────────────────────────
+
+interface RunOptions {
+  ai: boolean;
+  provider?: string;
+  model?: string;
+  apiKey?: string;
+  format: 'text' | 'json';
+}
+
 // ── Watch 模式 ────────────────────────────────────────
 
-async function runWatch(specDir: string, srcDir: string, options: typeof runOnce extends (...args: infer P) => any ? P[2] : any) {
+async function runWatch(specDir: string, srcDir: string, options: RunOptions) {
   const dirsToWatch = [specDir, srcDir].filter(d => existsSync(d));
   if (dirsToWatch.length === 0) {
     console.error(chalk.red('错误: 没有可监听的目录'));
@@ -299,7 +309,7 @@ async function main(): Promise<number> {
   const srcDir = resolve(values.src as string || config.srcDir);
   const outputFormat = (values.format as 'text' | 'json') || 'text';
 
-  const runOptions = {
+  const runOptions: RunOptions = {
     ai: (values.ai as boolean) || config.ai.enabled,
     provider: (values['ai-provider'] as string | undefined) || config.ai.provider,
     model: (values['ai-model'] as string | undefined) || config.ai.model,
