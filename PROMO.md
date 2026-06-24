@@ -76,8 +76,9 @@ spec-lint --watch
 
 ## 开源地址
 
+**GitHub:** https://github.com/3Bmates/spec-lint
 **Gitee:** https://gitee.com/bmates/spec-lint
-**npm:** `npm install -g spec-lint-cli` （即将发布）
+**npm:** `npm install -g spec-lint-cli`
 
 ## 适合谁来用？
 

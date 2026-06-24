@@ -2,7 +2,10 @@
 
 > 规格与代码一致性检查工具 — AI 驱动的 SDD 质量门禁
 
+[![npm version](https://img.shields.io/npm/v/spec-lint-cli)](https://www.npmjs.com/package/spec-lint-cli)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![CI](https://github.com/3Bmates/spec-lint/actions/workflows/ci.yml/badge.svg)](https://github.com/3Bmates/spec-lint/actions)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/3Bmates/spec-lint/pulls)
 
 ## 这是什么？
 

@@ -56,7 +56,7 @@ ${chalk.bold('示例:')}
   spec-lint init
 
 ${chalk.bold('配置文件:')} .spec-lintrc.json
-  https://gitee.com/bmates/spec-lint
+  https://github.com/3Bmates/spec-lint
 `.trim();
 
 // ── 工具函数 ──────────────────────────────────────────
