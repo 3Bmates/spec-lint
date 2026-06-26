@@ -149,7 +149,6 @@ interface FunctionSpec {
 - 需要有效的 API Key（`--ai-key` 或环境变量 `AI_API_KEY`）
 
 #### 行为
-
 1. 将规格内容 + 源码差异 发送给 AI
 2. AI 返回语义层面的审查意见
 3. 审查结果附加到最终报告中
